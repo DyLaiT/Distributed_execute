@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+sudo apt install jq
+mkdir separate
+# separate json log
+jq -cM --argjson sublen '5000' 'range(0; length; $sublen) as $i | .[$i:$i+$sublen]' $2 | split -l 1 -da 3 - separate/jsonsplit_
+
+# make dockerfile
+# $1 is your project in docker container path.
+cat <<EOF > ./Dockerfile
+From ubuntu:18.04
+MAINTAINER DYY
+RUN apt-get update && apt-get install -y python3 python3-pip
+COPY $1 /$1
+RUN pip3 install -r /$1/requirements.txt
+VOLUME ["/mount"]
+CMD ["/bin/bash", "/$1/start","/$1","/mount/separate/*"]
+EOF
+
+# docker build 
+docker build -t $1 .
+
+# up multiple container
+for sep_file in separate/*
+do
+  echo $sep_file
+  echo $(pwd)/$sep_file
+  # docker run container with volumes
+  docker run -v $(pwd)/$sep_file:/mount/$sep_file -i $1 &
+done
+rm -rf separate/
+
+
+

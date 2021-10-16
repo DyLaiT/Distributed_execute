@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+# custom command for your script.
+# $1 is your project path.
+# $2 is your separated log file.
+python3 $1/your_main_script.py $2
