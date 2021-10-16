@@ -1,0 +1,10 @@
+*.pyc
+.python-version
+*.log
+*.json
+test_project/*
+test_volumes/*
+Dockerfile
+data_log/*
+structured.png
+
